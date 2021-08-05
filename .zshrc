@@ -123,6 +123,10 @@ PATH="/usr/local/go/bin:/home/murillovaz/go/bin:$PATH"
 
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/.git/ --work-tree=$HOME'
 
+# To show all manually installed packages
+alias apt-installed="comm -23 <(apt-mark showmanual | sort -u) <(gzip -dc /var/log/installer/initial-status.gz | sed -n 's/^Package: //p' | sort -u)"
+
 naut() {
   nautilus --browser $1
 }
+
