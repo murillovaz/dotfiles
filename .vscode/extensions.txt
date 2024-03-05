@@ -1,2 +1,11 @@
+alexcvzz.vscode-sqlite
+donjayamanne.githistory
 golang.go-nightly
+jebbs.plantuml
+ms-python.debugpy
+ms-python.python
+ms-python.vscode-pylance
 notnullcorp.notnull-theme
+redhat.vscode-yaml
+ritwickdey.liveserver
+yzhang.markdown-all-in-one
