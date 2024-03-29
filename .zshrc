@@ -117,7 +117,7 @@ source $ZSH/oh-my-zsh.sh
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-PATH="/usr/local/go/bin:/home/$USER/go/bin:$PATH"
+PATH="/usr/local/go/bin:/home/$USER/go/bin:$PATH:/usr/local/zig"
 
 alias config="/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME"
 

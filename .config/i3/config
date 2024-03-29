@@ -40,6 +40,8 @@ exec --no-startup-id nitrogen --restore
 # Picom
 exec --no-startup-id picom --config ~/.config/picom/picom.conf -b
 
+# Saved workspaces
+exec --no-startup-id "i3-msg 'workspace 1; append_layout ~/.config/i3/workspace-1.json' && exec google-chrome & exec thunar & exec alacritty"
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status

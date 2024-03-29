@@ -1,4 +1,8 @@
 {
-    "workbench.colorTheme": "NotNull Dark"
+    "workbench.colorTheme": "NotNull Dark",
+    "zig.path": "/usr/local/zig/zig",
+    "zig.zls.path": "/home/murillovaz/.config/Code/User/globalStorage/ziglang.vscode-zig/zls_install/zls",
+    "zig.initialSetupDone": true,
+    "zig.zls.enableInlayHints": false
 
 }
