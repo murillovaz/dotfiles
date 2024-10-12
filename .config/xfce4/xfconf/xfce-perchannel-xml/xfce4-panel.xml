@@ -24,7 +24,7 @@
         <value type="int" value="14"/>
         <value type="int" value="18"/>
         <value type="int" value="12"/>
-        <value type="int" value="6"/>
+        <value type="int" value="7"/>
       </property>
       <property name="mode" type="uint" value="0"/>
       <property name="disable-struts" type="bool" value="false"/>
@@ -95,9 +95,9 @@
     <property name="plugin-20" type="string" value="separator">
       <property name="style" type="uint" value="0"/>
     </property>
-    <property name="plugin-6" type="string" value="launcher">
+    <property name="plugin-7" type="string" value="launcher">
       <property name="items" type="array">
-        <value type="string" value="17102291861.desktop"/>
+        <value type="string" value="17117556451.desktop"/>
       </property>
     </property>
   </property>
