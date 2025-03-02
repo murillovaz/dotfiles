@@ -118,7 +118,7 @@ source $ZSH/oh-my-zsh.sh
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 PATH="/usr/local/go/bin:/home/$USER/go/bin:$PATH:/usr/local/zig"
-PATH="$PATH:/opt/nvim-linux64/bin"
+PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 alias config="/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME"
 
 
