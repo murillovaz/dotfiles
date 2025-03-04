@@ -15,8 +15,16 @@ return {
 				},
 			})
 			local builtin = require("telescope.builtin")
-			vim.keymap.set("n", "<C-p>", builtin.find_files, {})
-			vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
+			vim.keymap.set("n", "<leader>fa", builtin.find_files, {})
+			vim.keymap.set("n", "<leader>fg", function()
+				builtin.live_grep({
+					previewer = true,
+					prompt_title = "Find in Files",
+					cwd_only = true,
+					initial_mode = "insert",
+				})
+			end, { noremap = true, silent = true })
+
 			vim.keymap.set("n", "<leader>rf", function()
 				builtin.oldfiles({
 					previewer = true,
