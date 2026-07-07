@@ -21,17 +21,30 @@ return {
 		config = function()
 			require("mason-lspconfig").setup({
 				ensure_installed = {
-					"ts_ls",
+					"vtsls", -- TypeScript/JavaScript (React/Next/Angular)
+					"eslint", -- JS/TS linting (respects each project's config)
+					"angularls", -- Angular templates (only starts in Angular projects)
+					"tailwindcss", -- Tailwind class completion (only where configured)
+					"emmet_language_server", -- HTML/JSX expansion
 					"html",
 					"lua_ls",
 					"pyright",
-					"biome",
+					"ruff", -- fast Python linter/formatter LSP (pairs with pyright)
 					"gopls",
 					"clangd",
+					"groovyls",
+					"jdtls",
+					"kotlin_language_server", -- Kotlin source + build.gradle.kts
 				},
 				-- v2: auto-enables installed servers via vim.lsp.enable().
 				-- (replaces the removed `automatic_installation` option)
-				automatic_enable = true,
+				-- jdtls is started per-project by nvim-jdtls (ftplugin/java.lua).
+				-- ts_ls (superseded by vtsls) and biome (superseded by eslint +
+				-- prettier) are excluded so they don't attach even though they
+				-- may still be installed from before.
+				automatic_enable = {
+					exclude = { "jdtls", "biome", "ts_ls" },
+				},
 			})
 		end,
 	},
@@ -45,6 +58,37 @@ return {
 			-- clangd is left to mason-lspconfig's automatic_enable. It used to be
 			-- disabled here due to a proto-file bug; re-check on 0.12 and, if it
 			-- still misbehaves, exclude it in mason-lspconfig's `automatic_enable`.
+
+			-- Python: resolve the virtualenv interpreter so pyright sees the
+			-- packages installed in your venv (else it uses system python).
+			local function python_path(root)
+				if vim.env.VIRTUAL_ENV and vim.env.VIRTUAL_ENV ~= "" then
+					return vim.fs.joinpath(vim.env.VIRTUAL_ENV, "bin", "python") -- activated venv
+				end
+				for _, name in ipairs({ ".venv", "venv" }) do -- project-local venv
+					local p = vim.fs.joinpath(root or vim.fn.getcwd(), name, "bin", "python")
+					if vim.uv.fs_stat(p) then
+						return p
+					end
+				end
+				local sys = vim.fn.exepath("python3")
+				return sys ~= "" and sys or "python"
+			end
+
+			vim.lsp.config("pyright", {
+				before_init = function(_, config)
+					config.settings = config.settings or {}
+					config.settings.python = config.settings.python or {}
+					config.settings.python.pythonPath = python_path(config.root_dir)
+				end,
+			})
+
+			-- ruff handles lint + code actions; let pyright own hover.
+			vim.lsp.config("ruff", {
+				on_attach = function(client)
+					client.server_capabilities.hoverProvider = false
+				end,
+			})
 
 			-- LSP keymaps, set per-buffer when a server attaches.
 			vim.api.nvim_create_autocmd("LspAttach", {
@@ -95,6 +139,17 @@ return {
 
 			vim.diagnostic.config({
 				virtual_lines = true,
+			})
+
+			-- Neither groovyls (*.gradle) nor kotlin_language_server
+			-- (*.gradle.kts) understands Gradle's script DSL, so they spam
+			-- false diagnostics in build scripts -- silence diagnostics there.
+			vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
+				pattern = { "*.gradle", "*.gradle.kts" },
+				callback = function(args)
+					vim.diagnostic.enable(false, { bufnr = args.buf })
+				end,
+				desc = "Disable diagnostics in Gradle build scripts",
 			})
 		end,
 	},

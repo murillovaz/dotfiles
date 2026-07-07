@@ -17,7 +17,7 @@ vim.opt.smartcase = true -- ...unless the query has a capital letter
 -- (see lua/plugins/tmux-navigator.lua) so it works seamlessly across
 -- nvim splits and tmux panes.
 
-vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>")
+vim.keymap.set("n", "<leader>nh", ":nohlsearch<CR>")
 vim.wo.number = true
 vim.wo.relativenumber = true
 
