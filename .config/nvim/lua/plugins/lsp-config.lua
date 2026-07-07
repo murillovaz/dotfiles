@@ -1,20 +1,27 @@
+-- Neovim 0.12 LSP setup.
+-- Servers are configured via the built-in `vim.lsp.config` / `vim.lsp.enable`
+-- API (nvim-lspconfig only ships the per-server `lsp/*.lua` definitions now;
+-- `require("lspconfig").xxx.setup{}` is deprecated). mason-lspconfig v2 installs
+-- the servers and, with `automatic_enable`, calls `vim.lsp.enable` for us.
 return {
 	{
-		"williamboman/mason.nvim",
+		"mason-org/mason.nvim", -- moved from williamboman/mason.nvim
 		lazy = false,
 		config = function()
 			require("mason").setup()
 		end,
 	},
 	{
-		"williamboman/mason-lspconfig.nvim",
+		"mason-org/mason-lspconfig.nvim", -- v2
 		lazy = false,
+		dependencies = {
+			"mason-org/mason.nvim",
+			"neovim/nvim-lspconfig",
+		},
 		config = function()
-			local mason_lspconfig = require("mason-lspconfig")
-			mason_lspconfig.setup({
-				automatic_installation = true,
+			require("mason-lspconfig").setup({
 				ensure_installed = {
-					"tsserver",
+					"ts_ls",
 					"html",
 					"lua_ls",
 					"pyright",
@@ -22,6 +29,9 @@ return {
 					"gopls",
 					"clangd",
 				},
+				-- v2: auto-enables installed servers via vim.lsp.enable().
+				-- (replaces the removed `automatic_installation` option)
+				automatic_enable = true,
 			})
 		end,
 	},
@@ -29,37 +39,63 @@ return {
 		"neovim/nvim-lspconfig",
 		lazy = false,
 		config = function()
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
+			-- Per-server overrides go here, e.g.:
+			-- vim.lsp.config("gopls", { settings = { gopls = {} } })
+			--
+			-- clangd is left to mason-lspconfig's automatic_enable. It used to be
+			-- disabled here due to a proto-file bug; re-check on 0.12 and, if it
+			-- still misbehaves, exclude it in mason-lspconfig's `automatic_enable`.
 
-			local lspconfig = require("lspconfig")
-			lspconfig.tsserver.setup({
-				capabilities = capabilities,
+			-- LSP keymaps, set per-buffer when a server attaches.
+			vim.api.nvim_create_autocmd("LspAttach", {
+				callback = function(args)
+					local bufnr = args.buf
+					local function map(mode, lhs, rhs)
+						vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true })
+					end
+
+					-- Formatting is handled by conform.nvim (<leader>f), which
+					-- falls back to vim.lsp.buf.format when no formatter is set.
+					map("n", "K", vim.lsp.buf.hover)
+					map("n", "<leader>gd", vim.lsp.buf.definition)
+					map("n", "<leader>gi", vim.lsp.buf.implementation)
+					map("n", "<leader>gr", vim.lsp.buf.references)
+					map("n", "<leader>rn", vim.lsp.buf.rename)
+					map("n", "<leader>ca", vim.lsp.buf.code_action)
+
+					-- Native LSP completion (0.11+). autotrigger=false keeps it
+					-- manual; press <C-.> to request completions.
+					local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+					if client:supports_method("textDocument/completion") then
+						vim.lsp.completion.enable(true, client.id, bufnr, { autotrigger = false })
+					end
+				end,
 			})
-			lspconfig.html.setup({
-				capabilities = capabilities,
+
+			-- Popup-menu navigation for the native completion menu.
+			local pumMaps = {
+				["<Tab>"] = "<C-n>",
+				["<S-Tab>"] = "<C-p>",
+				["<Down>"] = "<C-n>",
+				["<Up>"] = "<C-p>",
+				["<CR>"] = "<C-y>",
+			}
+			for insertKmap, pumKmap in pairs(pumMaps) do
+				vim.keymap.set("i", insertKmap, function()
+					return vim.fn.pumvisible() == 1 and pumKmap or insertKmap
+				end, { expr = true })
+			end
+			vim.keymap.set("i", "<C-.>", vim.lsp.completion.get, { noremap = true, silent = true })
+
+			vim.o.completeopt = "menu,noinsert,popup,fuzzy"
+			vim.o.winborder = "rounded"
+
+			-- To switch to fully-native, no-keymap autocompletion on 0.12 instead,
+			-- drop the <C-.>/autotrigger bits above and set: vim.o.autocomplete = true
+
+			vim.diagnostic.config({
+				virtual_lines = true,
 			})
-			lspconfig.lua_ls.setup({
-				capabilities = capabilities,
-			})
-			lspconfig.pyright.setup({
-				capabilities = capabilities,
-			})
-			lspconfig.biome.setup({
-				capabilities = capabilities,
-			})
-			lspconfig.gopls.setup({
-				capabilities = capabilities,
-			})
-			lspconfig.clangd.setup({
-				capabilities = capabilities,
-			})
-			vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, {})
-			vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
-			vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
-			vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation, {})
-			vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, {})
-			vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, {})
-			vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {})
 		end,
 	},
 }

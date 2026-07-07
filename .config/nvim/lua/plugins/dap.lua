@@ -5,6 +5,7 @@ return {
 		config = function()
 			local dap = require("dap")
 			-- Keybindings for debugging
+			vim.keymap.set("n", "<leader>dc", dap.run_to_cursor)
 			vim.keymap.set("n", "<F5>", require("dap").continue, {})
 			vim.keymap.set("n", "<F10>", require("dap").step_over, {})
 			vim.keymap.set("n", "<F11>", require("dap").step_into, {})
@@ -21,21 +22,11 @@ return {
 			local dapui = require("dapui")
 			dapui.setup()
 
-			-- Open UI automatically when debugging starts
-			--	local dap = require("dap")
-			--	dap.listeners.after.event_initialized["dapui_config"] = function()
-			--		dapui.open()
-			--		vim.cmd.Neotree("close")
-			--	end
-			--	dap.listeners.before.event_terminated["dapui_config"] = function()
-			--		dapui.close()
-			--	end
-			--	dap.listeners.before.event_exited["dapui_config"] = function()
-			--		dapui.close()
-			--	end
+			-- Eval var under cursor
+			vim.keymap.set("n", "<leader>dd", function()
+				dapui.eval(nil, { enter = true })
+			end)
 
-			--	-- Keybinding to toggle DAP UI
-			--			vim.keymap.set("n", "<leader>tu", dapui.toggle, {})
 			vim.keymap.set("n", "<leader>tu", function()
 				vim.cmd.Neotree("close")
 				dapui.toggle()
@@ -53,7 +44,15 @@ return {
 		"theHamsta/nvim-dap-virtual-text",
 		dependencies = { "mfussenegger/nvim-dap" },
 		config = function()
-			require("nvim-dap-virtual-text").setup()
+			require("nvim-dap-virtual-text").setup({
+				display_callback = function(variable)
+					if #variable.value > 30 then
+						return " " .. string.sub(variable.value, 1, 15) .. "... "
+					end
+
+					return " " .. variable.value
+				end,
+			})
 		end,
 	},
 }

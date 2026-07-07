@@ -5,6 +5,10 @@
     "zig.initialSetupDone": true,
     "zig.zls.enableInlayHints": false,
     "explorer.confirmDragAndDrop": false,
-    "go.toolsManagement.autoUpdate": true
+    "go.toolsManagement.autoUpdate": true,
+    "claudeCode.initialPermissionMode": "acceptEdits",
+    "claudeCode.allowDangerouslySkipPermissions": true,
+    "claudeCode.preferredLocation": "panel",
+    "git.enableSmartCommit": true
 
 }

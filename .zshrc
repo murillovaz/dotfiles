@@ -1,5 +1,11 @@
 source <(cat ~/scripts/*)
 
+BASE16_SHELL="$HOME/.config/base16-shell/"
+[ -n "$PS1" ] && \
+    [ -s "$BASE16_SHELL/profile_helper.sh" ] && \
+        source "$BASE16_SHELL/profile_helper.sh"
+        
+base16_darktooth
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -124,3 +130,15 @@ alias config="/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME"
 
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+export PATH="$HOME/development/flutter/bin:$PATH"
+export PATH="$PATH:/opt/android-studio/bin"
+export JAVA_HOME="/opt/android-studio/jbr"
+export PATH="$JAVA_HOME/bin:$PATH"
+export PATH="/home/murillovaz/development/flutter/bin:$PATH"
+
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$PATH:$HOME/go/bin"
+export PATH=$PATH:$HOME/.maestro/bin
+export PATH="$PATH:$HOME/.pub-cache/bin"
+
+export PLUGGY_TOKEN='Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InF1cU1faXVKQlVNeHZtRlV0RzR2OSJ9.eyJodHRwczovL2FwaS5wbHVnZ3kuYWkvZW1haWwiOiJwZXJzb25hbC5tdXJpbGxvdmF6QGdtYWlsLmNvbSIsImlzcyI6Imh0dHBzOi8vbXktcGx1Z2d5LnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJnb29nbGUtb2F1dGgyfDExMjg4MzY5NDY3MzM2NTU2MzU0MSIsImF1ZCI6WyJodHRwczovL215LWFwaS5wbHVnZ3kuYWkiLCJodHRwczovL215LXBsdWdneS51cy5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzgyMzUwMjQ2LCJleHAiOjE3ODI0MzY2NDYsInNjb3BlIjoib3BlbmlkIHByb2ZpbGUgZW1haWwiLCJhenAiOiJXelZVN0pCUlVWZHJHYko1STB6MkpxTjVJemd3WjMzTiIsInBlcm1pc3Npb25zIjpbXX0.G7OXQX6rfIM6voPinhjYqgFm3woOp_d-DLDjfBB-WPVHJVL4CX6kqK5UR6ZJg4ktZEQ8kmJfpJ0SBTKhLqR7cQFX6m9tXCrK5b0qwLphbH9NmVc7qPpJcBOzrfrrOpXcbTPxPO5ULQesxGE5PK5uzTcOiW0Ofa-8Ti5GSm1uw4vGf5aR2JN-AIpPSFxAHsYzs1739Zf_kYMPS-u6Nrj7RQvWKyvHsonYzDWVc9OtaHLq7wOPgNiOhjkRlDlA18dGSGmMnXfsXkqnebicAxxJt8el9z3c8ANKHWPpscpqqzwSdA4fkc4iW_eb4SZTF53CchsE76P8m5s3TKPTyw6h3A'

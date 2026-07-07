@@ -3,15 +3,19 @@
 --vim.cmd("set softtabstop=2")
 --vim.cmd("set shiftwidth=2")
 vim.g.mapleader = " "
-vim.g.background = "light"
 
 vim.opt.swapfile = false
 
--- Navigate vim panes better
-vim.keymap.set("n", "<c-k>", ":wincmd k<CR>")
-vim.keymap.set("n", "<c-j>", ":wincmd j<CR>")
-vim.keymap.set("n", "<c-h>", ":wincmd h<CR>")
-vim.keymap.set("n", "<c-l>", ":wincmd l<CR>")
+-- Quality-of-life defaults
+vim.opt.updatetime = 250 -- snappier CursorHold / gitsigns / diagnostics
+vim.opt.undofile = true -- persistent undo across sessions
+vim.opt.signcolumn = "yes" -- always show sign column so text doesn't jitter
+vim.opt.ignorecase = true -- case-insensitive search...
+vim.opt.smartcase = true -- ...unless the query has a capital letter
+
+-- Split/pane navigation (<C-hjkl>) is handled by vim-tmux-navigator
+-- (see lua/plugins/tmux-navigator.lua) so it works seamlessly across
+-- nvim splits and tmux panes.
 
 vim.keymap.set("n", "<leader>h", ":nohlsearch<CR>")
 vim.wo.number = true
@@ -41,3 +45,47 @@ end, {
 	desc = "Open terminal and execute command",
 })
 
+vim.api.nvim_create_autocmd("BufWritePost", {
+	callback = function()
+		vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR, open = false })
+	end,
+	desc = "Update Quickfix list with errors on save",
+})
+
+vim.api.nvim_create_user_command("DiagnosticsQF", function()
+	local qf_open = vim.fn.getqflist({ winid = 0 }).winid ~= 0
+
+	if qf_open then
+		vim.cmd("cclose")
+	else
+		local diagnostics = vim.diagnostic.get(nil, { severity = vim.diagnostic.severity.ERROR })
+
+		if #diagnostics == 0 then
+			vim.notify("No errors found!", vim.log.levels.INFO)
+		else
+			vim.diagnostic.setqflist({ severity = vim.diagnostic.severity.ERROR })
+		end
+	end
+end, { desc = "Toggle Quickfix list with errors" })
+
+vim.keymap.set("n", "<leader>q", ":DiagnosticsQF<CR>", { desc = "Show all errors in quickfix" })
+
+vim.keymap.set("n", "<leader>cl", function()
+	vim.cmd("vsplit")
+	vim.cmd("terminal claude")
+	vim.cmd("startinsert")
+end, { noremap = true, silent = true, desc = "Open Claude Code" })
+
+vim.opt.timeoutlen = 750
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "qf",
+	callback = function()
+		local qf_list = vim.fn.getqflist()
+		if #qf_list > 10 then
+			vim.cmd("resize 10")
+		else
+			vim.cmd("resize 5")
+		end
+	end,
+})
